@@ -1,6 +1,6 @@
 # ansible_k8s
 
-k8s_master ansible_ssh_host=192.168.0.181
+k8s_master ansible_ssh_host=192.168.0.181<br>  
 
 [k8s_servers]
 192.168.0.181 hostname=k8s01 ansible_ssh_user=root ansible_ssh_pass="xxx"
