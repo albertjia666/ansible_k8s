@@ -1,0 +1,6 @@
+---
+- name: ===> Upload Private Key to k8s01
+  copy:
+    src: /root/.ssh/id_rsa
+    dest: /root/.ssh/id_rsa
+    mode: "0600"

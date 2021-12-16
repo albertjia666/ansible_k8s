@@ -1,0 +1,70 @@
+---
+- name: Create kubeadm.yaml
+  shell: kubeadm config print init-defaults --component-configs KubeletConfiguration --component-configs KubeProxyConfiguration  > kubeadm.yaml
+  
+- name: Replace kubeadm.yaml
+  copy:
+    src: kubeadm.yaml
+    dest: /root/kubeadm.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Pull images
+  command: kubeadm config images pull --config /root/kubeadm.yaml
+  register: imageRes
+
+- name: Stdout Images
+  debug: msg={{ imageRes.stdout_lines }}
+
+- name: Install Master Node
+  command: kubeadm init --config /root/kubeadm.yaml
+  register: installRes
+
+- name: Get sha256 Code
+  shell: echo {{ installRes.stdout_lines[-1] }} | awk '{print $NF}'
+  register: sha256CodeStr
+
+- name: Stdout sha256 Code
+  debug: msg={{ sha256CodeStr.stdout_lines[0] }}
+
+- name: Set sha256 facts
+  set_fact:
+    sha256: "{{ sha256CodeStr.stdout_lines[0] }}"
+
+- name: Create .kube Dir
+  file:
+    path: /root/.kube
+    state: directory
+    mode: '0755'
+
+- name: Copy kube admin Cofig
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    remote_src: yes
+    owner: root
+    group: root
+    mode: '0644'
+
+#- name: ===> Generate an OpenSSH keypair with the default values (2048 bits, rsa)
+#  openssh_keypair:
+#    path: /root/.ssh/id_rsa
+#    size: 2048
+#    comment: root@k8s01
+#
+#- name: Upload Key to k8s01 and k8s02
+#  authorized_key:
+#    user: root
+#    state: present
+#    key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+
+- name: Copy admin conf to k8s01 and k8s02
+  copy:
+    src: kube_admin.sh
+    dest: /etc/kubernetes
+    mode: "0755"
+
+- name: Execute the script
+  command: sh /etc/kubernetes/kube_admin.sh
+

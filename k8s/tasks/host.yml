@@ -1,0 +1,12 @@
+---
+- name: ===> SET HOSTNAME
+  hostname:
+    name: '{{ hostname }}' 
+- name: ===> ADD TO /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    block: |-
+      {% for item in (groups['k8s_servers']|default([]))|unique -%}
+      {{ item }} {{ hostvars[item]['hostname'] }}
+      {% endfor %}
+    state: present

@@ -1,0 +1,9 @@
+---
+  - include: auth_key.yml
+  - include: host.yml
+  - include: security.yml
+  - include: repo.yml
+  - include: chrony.yml
+  - include: kernel.yml
+  - include: containerd.yml
+  - include: kube.yml

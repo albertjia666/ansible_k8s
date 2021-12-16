@@ -1,0 +1,35 @@
+---
+- name: ===> Add huaweicloud repo
+  get_url:
+    url: https://repo.huaweicloud.com/repository/conf/CentOS-7-reg.repo
+    dest: /etc/yum.repos.d/CentOS-Base.repo
+
+- name: ===> Add epel-release
+  yum:
+    name: epel-release
+    state: present
+
+- name: ===> Enable EPEL repo
+  ini_file:
+    dest: /etc/yum.repos.d/epel.repo
+    section: epel
+    option: enabled
+    value: '1'
+
+- name: ===> Update EPEL repo baseurl
+  replace:
+    dest: /etc/yum.repos.d/epel.repo
+    regexp: ^#baseurl=http://download.example/pub
+    replace: baseurl=https://repo.huaweicloud.com
+
+- name: ===> Update EPEL repo metalink
+  replace:
+    dest: /etc/yum.repos.d/epel.repo
+    regexp: ^metalink=
+    replace: '#metalink='
+
+- name: ===> Yum update
+  yum:
+    name: "*"
+    state: latest
+    update_cache: True

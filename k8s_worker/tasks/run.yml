@@ -1,0 +1,37 @@
+---
+- name: echo
+  command: "echo {{ hostvars['k8s_master']['sha256'] }}"
+  register: sha256Res
+
+- name: output
+  debug: msg={{ sha256Res.stdout_lines[0] }}
+
+- name: Join Master
+  command: kubeadm join 192.168.0.181:6443 --token abcdef.0123456789abcdef --discovery-token-ca-cert-hash "{{ sha256Res.stdout_lines[0] }}"
+
+- name: Set cri-tools env
+  lineinfile:
+    path: ~/.bashrc
+    regex: '^export CONTAINER_RUNTIME_ENDPOINT='
+    line: "export CONTAINER_RUNTIME_ENDPOINT=unix:///var/run/containerd/containerd.sock"
+
+- name: Export CONTAINER env
+  shell: "source ~/.bashrc && echo $CONTAINER_RUNTIME_ENDPOINT"
+  register: creRes
+
+- name: Output creRes
+  debug: msg={{ creRes }}
+
+- name: Set KUBECONFIG env
+  lineinfile:
+    path: ~/.bashrc
+    regex: '^export KUBECONFIG='
+    line: "export KUBECONFIG=/etc/kubernetes/admin.conf"
+
+- name: Export KUBECONFIG env
+  shell: "source ~/.bashrc && echo $KUBECONFIG"
+  register: kubeconfRes
+
+- name: Output kubeconfRes
+  debug: msg={{ kubeconfRes }}
+

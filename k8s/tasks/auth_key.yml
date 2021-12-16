@@ -1,0 +1,11 @@
+---
+#- name: ===> Generate an OpenSSH keypair with the default values (4096 bits, rsa)
+#  openssh_keypair:
+#    path: /root/.ssh/id_ssh_rsa
+#    type: rsa
+
+- name: ===> Upload Key to cluster servers
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"

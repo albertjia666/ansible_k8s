@@ -1,0 +1,13 @@
+---
+- name: Download calico.yaml
+  get_url:
+    url: https://docs.projectcalico.org/manifests/calico.yaml
+    dest: /root/calico.yaml
+    mode: '0644'
+
+- name: Install calico
+  command: kubectl apply -f calico.yaml
+  register: calicoRes
+
+- name: CalicoOutput
+  debug: msg={{ calicoRes }}

@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Generate an OpenSSH keypair with the default values (2048bits, rsa)
+      openssh_keypair:
+        path: /root/.ssh/id_rsa
+        size: 2048
+        comment: root@nc1
+
+- hosts: k8s_servers 
+  gather_facts: true
+  remote_user: root
+  roles:
+    - k8s
+
+- hosts: k8s_master
+  gather_facts: true
+  remote_user: root
+  roles:
+    - k8s_master
+
+- hosts: k8s_worker
+  gather_facts: true
+  remote_user: root
+  roles:
+    - k8s_worker

@@ -1,0 +1,4 @@
+---
+- include: auth_kubeadm.yml
+- include: kubeadm.yml
+- include: calico.yml

@@ -1,0 +1,22 @@
+---
+- name: ===> Shut Down Firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: false
+
+- name: ===> iptables -F
+  iptables:
+    chain: "{{ item }}"
+    flush: yes
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+- name: ===> Set SeLinux Config File
+  lineinfile:
+    dest: /etc/selinux/config
+    regexp: ^SELINUX=
+    line: SELINUX=disabled
+
+- name: ===> Disable SeLinux
+  selinux:
+    state: disabled
